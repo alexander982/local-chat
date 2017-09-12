@@ -40,7 +40,6 @@ public class Main {
                         ChannelPipeline pipeline = ch.pipeline();
                         pipeline.addLast(new MessageDecoder());
                         pipeline.addLast(new MessageHandler(t));
-                        pipeline.addLast(new MessageEncoder(address));
                     }
                 }).localAddress(address);
     }
