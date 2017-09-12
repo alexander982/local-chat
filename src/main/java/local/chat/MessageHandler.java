@@ -6,6 +6,7 @@ package local.chat;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import org.apache.log4j.Logger;
 
 import javax.swing.*;
 import java.util.Calendar;
@@ -16,16 +17,18 @@ import java.util.GregorianCalendar;
  */
 public class MessageHandler extends
         SimpleChannelInboundHandler<Message> {
+    private Logger log = Logger.getLogger(MessageHandler.class);
     private Main main;
 
     MessageHandler(Main main) {
         super();
         this.main = main;
+        log.debug("MessageHandler created");
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        System.out.println("Channel active");
+        log.info("Channel active");
     }
 
     @Override
@@ -41,15 +44,16 @@ public class MessageHandler extends
                 .append("] ")
                 .append(msg.from)
                 .append(": ");
-        System.out.println(sb);
         if (msg.type.equals("2")) {
             sb.append(msg.msg).append("\n");
             SwingUtilities.invokeLater(() -> main.getMsgLog().append(sb.toString()));
         }
+        log.debug("Decoded message received");
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        log.error(cause.getMessage(), cause);
         cause.printStackTrace();
         ctx.close();
     }
