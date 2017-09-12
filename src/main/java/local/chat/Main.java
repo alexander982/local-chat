@@ -22,7 +22,7 @@ public class Main {
     private Bootstrap bootstrapOutChannel;
     private EventLoopGroup group;
     private JTextArea msgLog;
-    private Channel channel;
+    private Channel outChannel;
     private static Logger log = Logger.getLogger(Main.class);
 
     Main() {
@@ -62,9 +62,13 @@ public class Main {
         return msgLog;
     }
 
-    public Channel bind() throws Exception {
-        channel = bootstrapInChannel.bind().sync().channel();
-        return channel;
+    public Channel bindIn() throws Exception {
+        return bootstrapInChannel.bind().sync().channel();
+    }
+
+    public Channel bindOut() throws Exception {
+        outChannel = bootstrapOutChannel.bind(0).sync().channel();
+        return outChannel;
     }
 
     public void stop() {
@@ -100,7 +104,7 @@ public class Main {
         sendBtn.addActionListener((ae) -> {
             Message msg = new Message(null, "2", "unknown",
                     "#Main", message.getText(), "$000B04FF");
-            channel.writeAndFlush(msg);
+            outChannel.writeAndFlush(msg);
             message.setText(null);
         });
 
@@ -121,8 +125,13 @@ public class Main {
         chat.init(new InetSocketAddress(port),
                 new InetSocketAddress("255.255.255.255", port));
         try {
-            Channel channel = chat.bind();
-            SwingUtilities.invokeLater(chat::makeGUI);
+            Channel channel = chat.bindIn();
+            try {
+                chat.bindOut();
+                SwingUtilities.invokeLater(chat::makeGUI);
+            } catch (Exception e) {
+                log.error("Bind out channel error.", e);
+            }
             log.info("Monitor running on port: " + port);
             channel.closeFuture().sync();
         } finally {
