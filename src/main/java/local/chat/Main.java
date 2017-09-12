@@ -8,6 +8,7 @@ import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioDatagramChannel;
+import org.apache.log4j.Logger;
 
 import javax.swing.*;
 
@@ -21,6 +22,7 @@ public class Main {
     private EventLoopGroup group;
     private JTextArea msgLog;
     private Channel channel;
+    private static Logger log = Logger.getLogger(Main.class);
 
     Main() {
     }
@@ -96,16 +98,18 @@ public class Main {
 
         //jfrm.pack();
         jfrm.setVisible(true);
+        log.info("GUI created");
     }
 
     public static void main(String[] args) throws Exception {
         final int port = 8167;
+        log.info("Start local chat...");
         Main chat = new Main();
         chat.init(new InetSocketAddress(port));
         try {
             Channel channel = chat.bind();
             SwingUtilities.invokeLater(chat::makeGUI);
-            System.out.println("Monitor running on port: " + port);
+            log.info("Monitor running on port: " + port);
             channel.closeFuture().sync();
         } finally {
             chat.stop();
