@@ -104,7 +104,7 @@ public class Main {
         chat.init(new InetSocketAddress(port));
         try {
             Channel channel = chat.bind();
-            SwingUtilities.invokeLater(() -> chat.makeGUI());
+            SwingUtilities.invokeLater(chat::makeGUI);
             System.out.println("Monitor running on port: " + port);
             channel.closeFuture().sync();
         } finally {
