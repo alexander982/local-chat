@@ -19,16 +19,17 @@ import java.net.InetSocketAddress;
 
 public class Main {
     private Bootstrap bootstrapInChannel;
+    private Bootstrap bootstrapOutChannel;
     private EventLoopGroup group;
     private JTextArea msgLog;
     private Channel channel;
     private static Logger log = Logger.getLogger(Main.class);
 
     Main() {
+        group = new NioEventLoopGroup();
     }
 
     private void initInbound(InetSocketAddress address) {
-        group = new NioEventLoopGroup();
         bootstrapInChannel = new Bootstrap();
         Main t = this;
         bootstrapInChannel.group(group)
@@ -42,6 +43,14 @@ public class Main {
                         pipeline.addLast(new MessageHandler(t));
                     }
                 }).localAddress(address);
+    }
+
+    private void initOutbound(InetSocketAddress address) {
+        bootstrapOutChannel = new Bootstrap();
+        bootstrapOutChannel.group(group)
+                .channel(NioDatagramChannel.class)
+                .option(ChannelOption.SO_BROADCAST, true)
+                .handler(new MessageEncoder(address));
     }
 
     public void init(InetSocketAddress address) {
