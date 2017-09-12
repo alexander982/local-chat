@@ -8,6 +8,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.handler.codec.MessageToMessageEncoder;
+import org.apache.log4j.Logger;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
@@ -17,6 +18,7 @@ import java.util.List;
  * Created by bepr on 11.09.17.
  */
 public class MessageEncoder extends MessageToMessageEncoder<Message> {
+    private Logger log = Logger.getLogger(MessageEncoder.class);
     private final InetSocketAddress remoteAddress;
 
     public MessageEncoder(InetSocketAddress remoteAddress) {
@@ -27,7 +29,7 @@ public class MessageEncoder extends MessageToMessageEncoder<Message> {
     protected void encode(ChannelHandlerContext ctx, Message message,
                           List<Object> out) throws Exception {
         Charset charset = Charset.forName("CP1251");
-        System.out.println("inside encoder");
+        log.debug("Encoding message " + message.id);
         byte[] id = message.id.getBytes(charset);
         byte[] type = message.type.getBytes(charset);
         byte[] channel = message.channel.getBytes(charset);
