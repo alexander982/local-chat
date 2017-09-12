@@ -1,0 +1,18 @@
+## Java
+*.class
+*.war
+hs_err_pid*
+
+## Gradle
+.gradle
+build/
+gradle-app.setting
+
+## Emacs
+*.*~
+
+## IDea
+.idea/
+*.ipr
+*.iws
+*.iml

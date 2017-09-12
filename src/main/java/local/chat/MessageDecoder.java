@@ -1,0 +1,50 @@
+/*
+ * Copyright (c) 2017 Kozlov A.
+ */
+
+package local.chat;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.socket.DatagramPacket;
+import io.netty.handler.codec.MessageToMessageDecoder;
+
+import java.nio.charset.Charset;
+import java.util.List;
+
+/**
+ * Created by bepr on 08.09.17.
+ */
+public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
+    @Override
+    protected void decode(ChannelHandlerContext ctx, DatagramPacket datagramPacket, List<Object> out) {
+        ByteBuf data = datagramPacket.content();
+        Charset charset = Charset.forName("CP1251");
+        String id = data.slice(0, 9).toString(charset);
+        String type = data.slice(10, 1).toString(charset);
+        System.out.println("message type " + type);
+        String from;
+        Message msg;
+        if ("2".equals(type)) {
+            int idx1 = data.indexOf(11, data.readableBytes(), Message.SEPARATOR);
+            String channel = data.slice(11, idx1 - 1).toString(charset);
+            int idx2 = data.indexOf(idx1 + 1, data.readableBytes(), Message.SEPARATOR);
+            from = data.slice(idx1 + 1, idx2 - idx1 - 1).toString(charset);
+            idx1 = idx2;
+            idx2 = data.indexOf(idx1 + 1, data.readableBytes(), Message.SEPARATOR);
+            String message = data.slice(idx1 + 1, idx2 - idx1 - 1).toString(charset);
+            idx1 = idx2;
+            idx2 = data.indexOf(idx1 + 1, data.readableBytes(), Message.SEPARATOR);
+            String color = data.slice(idx1 + 1, idx2 - idx1 - 1).toString(charset);
+            msg = new Message(id, type, from, channel, message, color);
+        } else {
+            int idx = data.indexOf(11, data.readableBytes(), Message.SEPARATOR) - 1;
+            from = data.slice(11, idx - 10)
+                    .toString(charset);
+            msg = new Message(id, type, from);
+        }
+
+        //System.out.println("Datagram packet received");
+        out.add(msg);
+    }
+}
