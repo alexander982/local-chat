@@ -53,8 +53,9 @@ public class Main {
                 .handler(new MessageEncoder(address));
     }
 
-    public void init(InetSocketAddress address) {
-        initInbound(address);
+    public void init(InetSocketAddress localAddress, InetSocketAddress remoteAddress) {
+        initInbound(localAddress);
+        initOutbound(remoteAddress);
     }
 
     public JTextArea getMsgLog() {
@@ -117,7 +118,8 @@ public class Main {
         final int port = 8167;
         log.info("Start local chat...");
         Main chat = new Main();
-        chat.init(new InetSocketAddress(port));
+        chat.init(new InetSocketAddress(port),
+                new InetSocketAddress("255.255.255.255", port));
         try {
             Channel channel = chat.bind();
             SwingUtilities.invokeLater(chat::makeGUI);
