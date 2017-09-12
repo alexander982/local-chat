@@ -18,7 +18,7 @@ import java.awt.event.WindowEvent;
 import java.net.InetSocketAddress;
 
 public class Main {
-    private Bootstrap bootstrap;
+    private Bootstrap bootstrapInChannel;
     private EventLoopGroup group;
     private JTextArea msgLog;
     private Channel channel;
@@ -27,11 +27,11 @@ public class Main {
     Main() {
     }
 
-    public void init(InetSocketAddress address) {
+    private void initInbound(InetSocketAddress address) {
         group = new NioEventLoopGroup();
-        bootstrap = new Bootstrap();
+        bootstrapInChannel = new Bootstrap();
         Main t = this;
-        bootstrap.group(group)
+        bootstrapInChannel.group(group)
                 .channel(NioDatagramChannel.class)
                 .option(ChannelOption.SO_BROADCAST, true)
                 .handler(new ChannelInitializer<Channel>() {
@@ -45,12 +45,16 @@ public class Main {
                 }).localAddress(address);
     }
 
+    public void init(InetSocketAddress address) {
+        initInbound(address);
+    }
+
     public JTextArea getMsgLog() {
         return msgLog;
     }
 
     public Channel bind() throws Exception {
-        channel = bootstrap.bind().sync().channel();
+        channel = bootstrapInChannel.bind().sync().channel();
         return channel;
     }
 
