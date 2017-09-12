@@ -8,6 +8,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.handler.codec.MessageToMessageDecoder;
+import org.apache.log4j.Logger;
 
 import java.nio.charset.Charset;
 import java.util.List;
@@ -16,13 +17,16 @@ import java.util.List;
  * Created by bepr on 08.09.17.
  */
 public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
+    private Logger log = Logger.getLogger(MessageDecoder.class);
     @Override
     protected void decode(ChannelHandlerContext ctx, DatagramPacket datagramPacket, List<Object> out) {
+        log.debug("Packed received from " + datagramPacket.sender());
         ByteBuf data = datagramPacket.content();
         Charset charset = Charset.forName("CP1251");
         String id = data.slice(0, 9).toString(charset);
         String type = data.slice(10, 1).toString(charset);
-        System.out.println("message type " + type);
+        log.debug("packet data: " + data.slice(0, data.readableBytes()).toString(charset));
+        log.debug("message type " + type);
         String from;
         Message msg;
         if ("2".equals(type)) {
@@ -33,6 +37,7 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
             idx1 = idx2;
             idx2 = data.indexOf(idx1 + 1, data.readableBytes(), Message.SEPARATOR);
             String message = data.slice(idx1 + 1, idx2 - idx1 - 1).toString(charset);
+            log.info(from + ": " + message);
             idx1 = idx2;
             idx2 = data.indexOf(idx1 + 1, data.readableBytes(), Message.SEPARATOR);
             String color = data.slice(idx1 + 1, idx2 - idx1 - 1).toString(charset);
@@ -44,7 +49,6 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
             msg = new Message(id, type, from);
         }
 
-        //System.out.println("Datagram packet received");
         out.add(msg);
     }
 }
