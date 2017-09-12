@@ -4,6 +4,8 @@
 
 package local.chat;
 
+import org.apache.log4j.Logger;
+
 import java.util.Random;
 
 /**
@@ -19,6 +21,7 @@ public class Message {
     public String channel;
     public String from;
     public String to;
+    private Logger log = Logger.getLogger(Message.class);
 
     public Message() {
         timestamp = System.currentTimeMillis();
@@ -48,7 +51,7 @@ public class Message {
         char[] chars = "abcdefghigklmnopqrstuvwxyz".toCharArray();
         for (int i = 0; i < 9; i++)
             id += chars[rnd.nextInt(26)];
-        System.out.println("create msg with id: " + id);
+        log.debug("create msg with id: " + id);
         return id;
     }
 
