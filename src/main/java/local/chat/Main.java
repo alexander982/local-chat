@@ -129,6 +129,7 @@ public class Main {
             try {
                 chat.bindOut();
                 SwingUtilities.invokeLater(chat::makeGUI);
+                log.info("Output channel running on: " + chat.outChannel.localAddress());
             } catch (Exception e) {
                 log.error("Bind out channel error.", e);
             }
