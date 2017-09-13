@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import javax.swing.*;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.net.InetSocketAddress;
@@ -98,15 +99,18 @@ public class Main {
         jfrm.add(jsp, BorderLayout.CENTER);
 
         JPanel panel = new JPanel(new BorderLayout());
+
         JTextField message = new JTextField();
         message.requestFocusInWindow();
         JButton sendBtn = new JButton("Send");
-        sendBtn.addActionListener((ae) -> {
+        ActionListener ae = ae1 -> {
             Message msg = new Message(null, "2", "unknown",
                     "#Main", message.getText(), "$000B04FF");
             outChannel.writeAndFlush(msg);
             message.setText(null);
-        });
+        };
+        message.addActionListener(ae);
+        sendBtn.addActionListener(ae);
 
         panel.add(message, BorderLayout.CENTER);
         panel.add(sendBtn, BorderLayout.LINE_END);
