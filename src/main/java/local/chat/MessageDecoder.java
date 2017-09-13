@@ -18,37 +18,44 @@ import java.util.List;
  */
 public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
     private Logger log = Logger.getLogger(MessageDecoder.class);
+    private String lastId = null;
     @Override
     protected void decode(ChannelHandlerContext ctx, DatagramPacket datagramPacket, List<Object> out) {
         log.debug("Packed received from " + datagramPacket.sender());
         ByteBuf data = datagramPacket.content();
         Charset charset = Charset.forName("CP1251");
         String id = data.slice(0, 9).toString(charset);
-        String type = data.slice(10, 1).toString(charset);
-        log.debug("packet data: " + data.slice(0, data.readableBytes()).toString(charset));
-        log.debug("message type " + type);
-        String from;
-        Message msg;
-        if ("2".equals(type)) {
-            int idx1 = data.indexOf(11, data.readableBytes(), Message.SEPARATOR);
-            String channel = data.slice(11, idx1 - 1).toString(charset);
-            int idx2 = data.indexOf(idx1 + 1, data.readableBytes(), Message.SEPARATOR);
-            from = data.slice(idx1 + 1, idx2 - idx1 - 1).toString(charset);
-            idx1 = idx2;
-            idx2 = data.indexOf(idx1 + 1, data.readableBytes(), Message.SEPARATOR);
-            String message = data.slice(idx1 + 1, idx2 - idx1 - 1).toString(charset);
-            log.info(from + ": " + message);
-            idx1 = idx2;
-            idx2 = data.indexOf(idx1 + 1, data.readableBytes(), Message.SEPARATOR);
-            String color = data.slice(idx1 + 1, idx2 - idx1 - 1).toString(charset);
-            msg = new Message(id, type, from, channel, message, color);
-        } else {
-            int idx = data.indexOf(11, data.readableBytes(), Message.SEPARATOR) - 1;
-            from = data.slice(11, idx - 10)
-                    .toString(charset);
-            msg = new Message(id, type, from);
-        }
 
-        out.add(msg);
+        if (lastId == null || !lastId.equals(id)) {
+            lastId = id;
+            String type = data.slice(10, 1).toString(charset);
+            log.debug("packet data: " + data.slice(0, data.readableBytes()).toString(charset));
+            log.debug("message type " + type);
+            String from;
+            Message msg;
+            if ("2".equals(type)) {
+                int idx1 = data.indexOf(11, data.readableBytes(), Message.SEPARATOR);
+                String channel = data.slice(11, idx1 - 1).toString(charset);
+                int idx2 = data.indexOf(idx1 + 1, data.readableBytes(), Message.SEPARATOR);
+                from = data.slice(idx1 + 1, idx2 - idx1 - 1).toString(charset);
+                idx1 = idx2;
+                idx2 = data.indexOf(idx1 + 1, data.readableBytes(), Message.SEPARATOR);
+                String message = data.slice(idx1 + 1, idx2 - idx1 - 1).toString(charset);
+                log.info(from + ": " + message);
+                idx1 = idx2;
+                idx2 = data.indexOf(idx1 + 1, data.readableBytes(), Message.SEPARATOR);
+                String color = data.slice(idx1 + 1, idx2 - idx1 - 1).toString(charset);
+                msg = new Message(id, type, from, channel, message, color);
+            } else {
+                int idx = data.indexOf(11, data.readableBytes(), Message.SEPARATOR) - 1;
+                from = data.slice(11, idx - 10)
+                        .toString(charset);
+                msg = new Message(id, type, from);
+            }
+
+            out.add(msg);
+        } else {
+            log.debug("once again message with id: " + id);
+        }
     }
 }
