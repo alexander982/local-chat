@@ -28,7 +28,7 @@ public class MessageHandler extends
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        log.info("Channel active");
+        log.info("Input channel active");
     }
 
     @Override
