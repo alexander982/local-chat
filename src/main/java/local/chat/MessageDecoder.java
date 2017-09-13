@@ -24,6 +24,11 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
         log.debug("Packed received from " + datagramPacket.sender());
         ByteBuf data = datagramPacket.content();
         Charset charset = Charset.forName("CP1251");
+        if (data.getByte(0) != (byte) 'X') {
+            log.debug("packet data: " + data.slice(0, data.readableBytes()).toString(charset));
+            log.debug("Not a message");
+            return;
+        }
         String id = data.slice(0, 9).toString(charset);
 
         if (lastId == null || !lastId.equals(id)) {
