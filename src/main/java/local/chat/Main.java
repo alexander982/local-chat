@@ -19,6 +19,7 @@ import java.awt.event.WindowEvent;
 import java.net.InetSocketAddress;
 
 public class Main {
+    private String name = "admin";
     private Bootstrap bootstrapInChannel;
     private Bootstrap bootstrapOutChannel;
     private EventLoopGroup group;
@@ -104,7 +105,7 @@ public class Main {
         message.requestFocusInWindow();
         JButton sendBtn = new JButton("Send");
         ActionListener ae = ae1 -> {
-            Message msg = new Message(null, "2", "unknown",
+            Message msg = new Message(null, "2", name,
                     "#Main", message.getText(), "$000B04FF");
             outChannel.writeAndFlush(msg);
             message.setText(null);
