@@ -62,4 +62,9 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
             log.debug("once again message with id: " + id);
         }
     }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        log.error("Error while decoding incoming message.", cause);
+    }
 }
