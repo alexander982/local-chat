@@ -29,7 +29,7 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
             log.debug("Not a message");
             return;
         }
-        String id = data.slice(0, 9).toString(charset);
+        String id = data.slice(0, 10).toString(charset);
 
         if (lastId == null || !lastId.equals(id)) {
             lastId = id;
