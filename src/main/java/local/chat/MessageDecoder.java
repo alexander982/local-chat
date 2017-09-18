@@ -29,6 +29,10 @@ public class MessageDecoder extends MessageToMessageDecoder<DatagramPacket> {
             log.debug("Not a message");
             return;
         }
+        if (data.readableBytes() < 11) {
+            log.debug("Message too short");
+            return;
+        }
         String id = data.slice(0, 10).toString(charset);
 
         if (lastId == null || !lastId.equals(id)) {
